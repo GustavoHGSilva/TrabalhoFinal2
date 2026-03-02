@@ -27,16 +27,16 @@ namespace TrabalhoFinal2
                 try
                 {
                     conexao.Open();
-                    string sql = "SELECT usuario_ID, nome FROM usuarios"; 
+                    string sql = "SELECT usuario_ID, nome FROM usuarios";
                     MySqlDataAdapter da = new MySqlDataAdapter(sql, conexao);
                     DataTable dt = new DataTable();
                     da.Fill(dt);
 
                     cmbTecnico.DataSource = dt;
-                    cmbTecnico.DisplayMember = "nome"; 
-                    cmbTecnico.ValueMember = "usuario_ID";    
+                    cmbTecnico.DisplayMember = "nome";
+                    cmbTecnico.ValueMember = "usuario_ID";
 
-                    cmbTecnico.SelectedIndex = -1; 
+                    cmbTecnico.SelectedIndex = -1;
                 }
                 catch (Exception ex) { MessageBox.Show("Erro: " + ex.Message); }
             }
@@ -105,31 +105,38 @@ namespace TrabalhoFinal2
             }
 
 
-            string connectionString = "Server=localhost;Database=fastH;Uid=root;Pwd=23571113;";
-            using (MySqlConnection conexao = new MySqlConnection(connectionString))
+            ConexaoBanco bd = new ConexaoBanco();
+
+            try
             {
-                try
+                
+                bd.AbrirConexao();
+
+                string sql = "INSERT INTO servicos (tecnico_id, cliente, telefone, problema, statusP) " +
+                             "VALUES (@tecnico_id, @cliente, @telefone, @problema, @status)";
+
+                using (MySqlCommand cmd = new MySqlCommand(sql, bd.conectar))
                 {
-                    conexao.Open();
-                    string sql = "INSERT INTO servicos (tecnico_id, cliente, telefone, problema, statusP) " +
-                                 "VALUES (@tecnico_id, @cliente, @telefone, @problema, @status)";
+                    cmd.Parameters.AddWithValue("@tecnico_id", Convert.ToInt32(cmbTecnico.SelectedValue));
+                    cmd.Parameters.AddWithValue("@cliente", txtCliente.Text);
+                    cmd.Parameters.AddWithValue("@telefone", txtTelefone.Text);
+                    cmd.Parameters.AddWithValue("@problema", txtProblema.Text);
+                    cmd.Parameters.AddWithValue("@status", cmbStatus.Text);
 
-                    using (MySqlCommand cmd = new MySqlCommand(sql, conexao))
-                    {
-                        cmd.Parameters.AddWithValue("@tecnico_id", Convert.ToInt32(cmbTecnico.SelectedValue));
-                        cmd.Parameters.AddWithValue("@cliente", txtCliente.Text);
-                        cmd.Parameters.AddWithValue("@telefone", txtTelefone.Text);
-                        cmd.Parameters.AddWithValue("@problema", txtProblema.Text);
-                        cmd.Parameters.AddWithValue("@status", cmbStatus.Text);
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Ordem de serviço adicionada!");
 
-                        cmd.ExecuteNonQuery();
-                        MessageBox.Show("Ordem de serviço adicionada!");
-
-                        CarregarDadosNoGrid();
-                        LimparCampos();
-                    }
+                    CarregarDadosNoGrid();
+                    LimparCampos();
                 }
-                catch (Exception ex) { MessageBox.Show("Erro: " + ex.Message); }
+            }
+            catch (Exception ex) 
+            { 
+                MessageBox.Show("Erro: " + ex.Message); 
+            }
+            finally
+            {
+                bd.FecharConexao();
             }
         }
 
@@ -143,14 +150,14 @@ namespace TrabalhoFinal2
             {
                 DataGridViewRow row = dgvAssistencia.Rows[e.RowIndex];
 
-               
+
                 txtIdServico.Text = row.Cells["servico_id"].Value.ToString();
                 txtCliente.Text = row.Cells["cliente"].Value.ToString();
                 txtTelefone.Text = row.Cells["telefone"].Value.ToString();
                 txtProblema.Text = row.Cells["problema"].Value.ToString();
                 cmbStatus.Text = row.Cells["statusP"].Value.ToString();
 
- 
+
                 cmbTecnico.SelectedValue = row.Cells["tecnico_id"].Value;
             }
 
@@ -160,43 +167,50 @@ namespace TrabalhoFinal2
         {
 
 
-            if (cmbTecnico.SelectedValue == null || string.IsNullOrEmpty(txtIdServico.Text))
+            if (string.IsNullOrEmpty(txtIdServico.Text) || cmbTecnico.SelectedValue == null)
             {
-                MessageBox.Show("Selecione um registro e um técnico válido!");
+                MessageBox.Show("Selecione um registro na grade e um técnico válido antes de atualizar.");
                 return;
             }
 
-            string connectionString = "Server=localhost;Database=fastH;Uid=root;Pwd=23571113;";
-            using (MySqlConnection conexao = new MySqlConnection(connectionString))
+
+            ConexaoBanco bd = new ConexaoBanco();
+
+            try
             {
-                try
+
+                bd.AbrirConexao();
+
+                string sql = "UPDATE servicos SET tecnico_id = @tecnico_id, cliente = @cliente, " +
+                             "telefone = @telefone, problema = @problema, statusP = @status " +
+                             "WHERE servico_id = @id";
+
+
+                using (MySqlCommand cmd = new MySqlCommand(sql, bd.conectar))
                 {
-                    conexao.Open();
-                    string sql = "UPDATE servicos SET tecnico_id = @tecnico_id, cliente = @cliente, " +
-                                 "telefone = @telefone, problema = @problema, statusP = @status " +
-                                 "WHERE servico_id = @id";
 
-                    using (MySqlCommand cmd = new MySqlCommand(sql, conexao))
-                    {
-                        
-                        cmd.Parameters.AddWithValue("@tecnico_id", Convert.ToInt32(cmbTecnico.SelectedValue));
-                        cmd.Parameters.AddWithValue("@cliente", txtCliente.Text);
-                        cmd.Parameters.AddWithValue("@telefone", txtTelefone.Text);
-                        cmd.Parameters.AddWithValue("@problema", txtProblema.Text);
-                        cmd.Parameters.AddWithValue("@status", cmbStatus.Text);
-                        cmd.Parameters.AddWithValue("@id", txtIdServico.Text);
+                    cmd.Parameters.AddWithValue("@tecnico_id", Convert.ToInt32(cmbTecnico.SelectedValue));
+                    cmd.Parameters.AddWithValue("@cliente", txtCliente.Text);
+                    cmd.Parameters.AddWithValue("@telefone", txtTelefone.Text);
+                    cmd.Parameters.AddWithValue("@problema", txtProblema.Text);
+                    cmd.Parameters.AddWithValue("@status", cmbStatus.Text);
+                    cmd.Parameters.AddWithValue("@id", txtIdServico.Text);
 
-                        cmd.ExecuteNonQuery();
-                        MessageBox.Show("Registro atualizado com sucesso!");
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Ordem de serviço atualizada com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                        CarregarDadosNoGrid();
-                        LimparCampos();
-                    }
+
+                    CarregarDadosNoGrid();
+                    LimparCampos();
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Erro ao atualizar: " + ex.Message);
-                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao atualizar dados: " + ex.Message);
+            }
+            finally
+            {
+                bd.FecharConexao();
             }
         }
 
@@ -204,42 +218,41 @@ namespace TrabalhoFinal2
         {
             if (string.IsNullOrEmpty(txtIdServico.Text))
             {
-                MessageBox.Show("Por favor, selecione uma ordem de serviço na lista para excluir.");
+                MessageBox.Show("Selecione uma ordem de serviço na lista para excluir.");
                 return;
             }
 
-            DialogResult result = MessageBox.Show("Tem certeza que deseja excluir esta ordem de serviço? Esta ação não pode ser desfeita!",
+            DialogResult result = MessageBox.Show("Tem certeza que deseja excluir?",
                 "Confirmar Exclusão", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
 
             if (result == DialogResult.Yes)
             {
-                string connectionString = "Server=localhost;Database=fastH;Uid=root;Pwd=23571113;";
+                ConexaoBanco bd = new ConexaoBanco();
 
-                using (MySqlConnection conexao = new MySqlConnection(connectionString))
+                try
                 {
-                    try
+                    bd.AbrirConexao();
+
+                    string sql = "DELETE FROM servicos WHERE servico_id = @id";
+
+
+                    using (MySqlCommand cmd = new MySqlCommand(sql, bd.conectar))
                     {
-                        conexao.Open();
+                        cmd.Parameters.AddWithValue("@id", txtIdServico.Text);
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Excluído com sucesso!");
 
-  
-                        string sql = "DELETE FROM servicos WHERE servico_id = @id";
-
-                        using (MySqlCommand cmd = new MySqlCommand(sql, conexao))
-                        {
-                            cmd.Parameters.AddWithValue("@id", txtIdServico.Text);
-
-                            cmd.ExecuteNonQuery();
-                            MessageBox.Show("Ordem de serviço excluída com sucesso!");
-
-             
-                            CarregarDadosNoGrid();
-                            LimparCampos();
-                        }
+                        CarregarDadosNoGrid();
+                        LimparCampos();
                     }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Erro ao excluir: " + ex.Message);
-                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Erro: " + ex.Message);
+                }
+                finally
+                {
+                    bd.FecharConexao();
                 }
             }
         }

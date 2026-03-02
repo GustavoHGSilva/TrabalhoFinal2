@@ -57,6 +57,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(125, 25);
             this.textBox1.TabIndex = 4;
+            this.textBox1.Visible = false;
             // 
             // dgvAssistencia
             // 
@@ -97,6 +98,7 @@
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 5;
             this.pictureBox1.TabStop = false;
+            this.pictureBox1.Visible = false;
             // 
             // txtCliente
             // 
