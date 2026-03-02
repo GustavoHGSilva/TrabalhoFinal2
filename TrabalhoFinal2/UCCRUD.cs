@@ -21,14 +21,13 @@ namespace TrabalhoFinal2
 
         private void PreencherComboTecnicos()
         {
-            string connectionString = "Server=localhost;Database=fastH;Uid=root;Pwd=23571113;";
-            using (MySqlConnection conexao = new MySqlConnection(connectionString))
-            {
+
+                ConexaoBanco bd = new ConexaoBanco();
                 try
                 {
-                    conexao.Open();
+                    bd.AbrirConexao();
                     string sql = "SELECT usuario_ID, nome FROM usuarios";
-                    MySqlDataAdapter da = new MySqlDataAdapter(sql, conexao);
+                    MySqlDataAdapter da = new MySqlDataAdapter(sql, bd.conectar);
                     DataTable dt = new DataTable();
                     da.Fill(dt);
 
@@ -39,27 +38,23 @@ namespace TrabalhoFinal2
                     cmbTecnico.SelectedIndex = -1;
                 }
                 catch (Exception ex) { MessageBox.Show("Erro: " + ex.Message); }
-            }
         }
 
 
         private void CarregarDadosNoGrid()
         {
 
-            string connectionString = "Server=localhost;Database=fastH;Uid=root;Pwd=23571113;";
-
-            using (MySqlConnection conexao = new MySqlConnection(connectionString))
-            {
+                ConexaoBanco bd = new ConexaoBanco();
                 try
                 {
-                    conexao.Open();
+                    bd.AbrirConexao();
 
 
                     string sql = "SELECT s.servico_id, u.nome as Tecnico, s.cliente, s.telefone, s.problema, s.statusP, s.tecnico_id " +
                     "FROM servicos s " +
                      "INNER JOIN usuarios u ON s.tecnico_id = u.usuario_ID";
 
-                    MySqlDataAdapter da = new MySqlDataAdapter(sql, conexao);
+                    MySqlDataAdapter da = new MySqlDataAdapter(sql, bd.conectar);
                     DataTable dt = new DataTable();
                     da.Fill(dt);
 
@@ -72,7 +67,6 @@ namespace TrabalhoFinal2
                 {
                     MessageBox.Show("Erro ao carregar a lista de assistência: " + ex.Message);
                 }
-            }
         }
 
         private void LimparCampos()
