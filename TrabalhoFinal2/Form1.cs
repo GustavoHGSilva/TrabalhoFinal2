@@ -16,7 +16,7 @@ namespace TrabalhoFinal2
         public Form1()
         {
             InitializeComponent();
-            
+
         }
 
 
@@ -27,7 +27,7 @@ namespace TrabalhoFinal2
 
         private void CarregarUserControl(UserControl uc)
         {
-            
+
             panelLogin.Controls.Clear();
 
             uc.Dock = DockStyle.Fill;
@@ -47,21 +47,22 @@ namespace TrabalhoFinal2
         {
             UCLogin login = new UCLogin();
 
-            login.LoginSucesso += (s, args) => {
+            login.LoginSucesso += (s, args) =>
+            {
 
                 Form2 principal = new Form2();
 
-                
+
                 principal.Show();
 
-                
+
                 principal.FormClosed += (s2, args2) => this.Close();
 
-                
+
                 this.Hide();
             };
 
-            
+
             login.EventoIrParaCadastro += (s, args) => ExibirCadastro();
 
             CarregarUserControl(login);
@@ -72,12 +73,12 @@ namespace TrabalhoFinal2
         {
             UCCadastro cadastro = new UCCadastro();
 
-            
+
             cadastro.EventoVoltarParaLogin += (s, args) => ExibirLogin();
 
             CarregarUserControl(cadastro);
         }
 
-        
+
     }
 }

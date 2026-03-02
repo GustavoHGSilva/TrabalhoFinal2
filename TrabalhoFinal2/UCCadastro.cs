@@ -43,39 +43,39 @@ namespace TrabalhoFinal2
 
         private void botaoFinalizar_Click(object sender, EventArgs e)
         {
- 
-                ConexaoBanco bd = new ConexaoBanco();
-                try
+
+            ConexaoBanco bd = new ConexaoBanco();
+            try
+            {
+                bd.AbrirConexao();
+
+
+                string sql = "INSERT INTO usuarios (nome, usuario, email, telefone, senha) " +
+                             "VALUES (@nome, @usuario, @email, @telefone, @senha)";
+
+                using (MySqlCommand cmd = new MySqlCommand(sql, bd.conectar))
                 {
-                    bd.AbrirConexao();
 
-                    
-                    string sql = "INSERT INTO usuarios (nome, usuario, email, telefone, senha) " +
-                                 "VALUES (@nome, @usuario, @email, @telefone, @senha)";
+                    cmd.Parameters.AddWithValue("@nome", txtNome.Text);
+                    cmd.Parameters.AddWithValue("@usuario", txtUsuario.Text);
+                    cmd.Parameters.AddWithValue("@email", txtEmail.Text);
+                    cmd.Parameters.AddWithValue("@telefone", txtTelefone.Text);
+                    cmd.Parameters.AddWithValue("@senha", txtSenha.Text);
 
-                    using (MySqlCommand cmd = new MySqlCommand(sql, bd.conectar))
-                    {
-                        
-                        cmd.Parameters.AddWithValue("@nome", txtNome.Text);
-                        cmd.Parameters.AddWithValue("@usuario", txtUsuario.Text);
-                        cmd.Parameters.AddWithValue("@email", txtEmail.Text);
-                        cmd.Parameters.AddWithValue("@telefone", txtTelefone.Text);
-                        cmd.Parameters.AddWithValue("@senha", txtSenha.Text);
 
-                       
-                        cmd.ExecuteNonQuery();
+                    cmd.ExecuteNonQuery();
 
-                        MessageBox.Show("Usuário cadastrado com sucesso!");
+                    MessageBox.Show("Usuário cadastrado com sucesso!");
 
-                        
-                        LimparCampos();
-                    }
 
+                    LimparCampos();
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Erro ao conectar ou salvar: " + ex.Message);
-                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao conectar ou salvar: " + ex.Message);
+            }
         }
     }
 }

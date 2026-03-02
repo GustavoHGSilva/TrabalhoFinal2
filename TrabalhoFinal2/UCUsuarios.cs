@@ -22,78 +22,72 @@ namespace TrabalhoFinal2
 
         private void CarregarDadosNoGrid()
         {
-            string connectionString = "Server=localhost;Database=fastH;Uid=root;Pwd=23571113;";
 
-            using (MySqlConnection conexao = new MySqlConnection(connectionString))
+            ConexaoBanco bd = new ConexaoBanco();
+            try
             {
-                try
-                {
-                    conexao.Open();
-
-     
-                    string sql = "SELECT nome, usuario, email, telefone FROM usuarios";
-
-                    MySqlDataAdapter da = new MySqlDataAdapter(sql, conexao);
-                    DataTable dt = new DataTable();
+                bd.AbrirConexao();
 
 
-                    da.Fill(dt);
+                string sql = "SELECT nome, usuario, email, telefone FROM usuarios";
 
-                    dgvUsuarios.DataSource = dt;
-                    dgvUsuarios.Columns["nome"].HeaderText = "Nome Completo";
-                    dgvUsuarios.Columns["usuario"].HeaderText = "Login";
-                    dgvUsuarios.Columns["email"].HeaderText = "E-mail";
-                    dgvUsuarios.Columns["telefone"].HeaderText = "Telefone";
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Erro ao carregar lista: " + ex.Message);
-                }
+                MySqlDataAdapter da = new MySqlDataAdapter(sql, bd.conectar);
+                DataTable dt = new DataTable();
+
+
+                da.Fill(dt);
+
+                dgvUsuarios.DataSource = dt;
+                dgvUsuarios.Columns["nome"].HeaderText = "Nome Completo";
+                dgvUsuarios.Columns["usuario"].HeaderText = "Login";
+                dgvUsuarios.Columns["email"].HeaderText = "E-mail";
+                dgvUsuarios.Columns["telefone"].HeaderText = "Telefone";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao carregar lista: " + ex.Message);
             }
         }
 
 
         private void FiltrarUsuarios(string busca)
         {
-            string connectionString = "Server=localhost;Database=fastH;Uid=root;Pwd=23571113;";
 
-            using (MySqlConnection conexao = new MySqlConnection(connectionString))
+            ConexaoBanco bd = new ConexaoBanco();
+            try
             {
-                try
-                {
-                    conexao.Open();
+                bd.AbrirConexao();
 
 
-                    string sql = "SELECT nome, usuario, email, telefone FROM usuarios WHERE nome LIKE @busca";
+                string sql = "SELECT nome, usuario, email, telefone FROM usuarios WHERE nome LIKE @busca";
 
-                    MySqlDataAdapter da = new MySqlDataAdapter(sql, conexao);
+                MySqlDataAdapter da = new MySqlDataAdapter(sql, bd.conectar);
 
-          
-                    da.SelectCommand.Parameters.AddWithValue("@busca", busca + "%");
 
-                    DataTable dt = new DataTable();
-                    da.Fill(dt);
-                    dgvUsuarios.DataSource = dt;
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Erro ao buscar: " + ex.Message);
-                }
+                da.SelectCommand.Parameters.AddWithValue("@busca", busca + "%");
+
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                dgvUsuarios.DataSource = dt;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao buscar: " + ex.Message);
             }
         }
 
         private void txtBusca_TextChanged(object sender, EventArgs e)
         {
-  
+
             FiltrarUsuarios(txtPesquisa.Text);
         }
 
         private void ExecutarBusca()
         {
-     
+
             string termo = txtPesquisa.Text.Trim();
 
-       
+
             FiltrarUsuarios(termo);
         }
 
@@ -105,12 +99,12 @@ namespace TrabalhoFinal2
 
         private void txtBusca_KeyDown(object sender, KeyEventArgs e)
         {
-         
+
             if (e.KeyCode == Keys.Enter)
             {
                 ExecutarBusca();
 
-            
+
                 e.SuppressKeyPress = true;
             }
         }
@@ -127,7 +121,7 @@ namespace TrabalhoFinal2
             {
                 DataGridViewRow row = dgvUsuarios.Rows[e.RowIndex];
 
-                
+
                 txtNome.Text = row.Cells["nome"].Value.ToString();
                 txtLogin.Text = row.Cells["usuario"].Value.ToString();
                 txtEmail.Text = row.Cells["email"].Value.ToString();
@@ -149,32 +143,28 @@ namespace TrabalhoFinal2
 
             if (confirmacao == DialogResult.Yes)
             {
-                string connectionString = "Server=localhost;Database=fastH;Uid=root;Pwd=23571113;";
-
-                using (MySqlConnection conexao = new MySqlConnection(connectionString))
+                ConexaoBanco bd = new ConexaoBanco();
+                try
                 {
-                    try
+                    bd.AbrirConexao();
+
+                    string sql = "DELETE FROM usuarios WHERE usuario = @user";
+
+                    using (MySqlCommand cmd = new MySqlCommand(sql, bd.conectar))
                     {
-                        conexao.Open();
-                
-                        string sql = "DELETE FROM usuarios WHERE usuario = @user";
+                        cmd.Parameters.AddWithValue("@user", txtLogin.Text);
+                        cmd.ExecuteNonQuery();
 
-                        using (MySqlCommand cmd = new MySqlCommand(sql, conexao))
-                        {
-                            cmd.Parameters.AddWithValue("@user", txtLogin.Text);
-                            cmd.ExecuteNonQuery();
+                        MessageBox.Show("Usuário removido com sucesso!");
 
-                            MessageBox.Show("Usuário removido com sucesso!");
+                        LimparCampos();
 
-                            LimparCampos();
-                       
-                            CarregarDadosNoGrid();
-                        }
+                        CarregarDadosNoGrid();
                     }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Erro ao apagar: " + ex.Message);
-                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Erro ao apagar: " + ex.Message);
                 }
             }
         }
@@ -199,48 +189,44 @@ namespace TrabalhoFinal2
                 return;
             }
 
-            string connectionString = "Server=localhost;Database=fastH;Uid=root;Pwd=23571113;";
-
-            using (MySqlConnection conexao = new MySqlConnection(connectionString))
+            ConexaoBanco bd = new ConexaoBanco();
+            try
             {
-                try
+                bd.AbrirConexao();
+
+
+                string sql = "UPDATE usuarios SET nome = @nome, email = @email, telefone = @telefone " +
+                             "WHERE usuario = @usuario";
+
+                using (MySqlCommand cmd = new MySqlCommand(sql, bd.conectar))
                 {
-                    conexao.Open();
 
+                    cmd.Parameters.AddWithValue("@nome", txtNome.Text);
+                    cmd.Parameters.AddWithValue("@email", txtEmail.Text);
+                    cmd.Parameters.AddWithValue("@telefone", txtTelefone.Text);
+                    cmd.Parameters.AddWithValue("@usuario", txtLogin.Text);
 
-                    string sql = "UPDATE usuarios SET nome = @nome, email = @email, telefone = @telefone " +
-                                 "WHERE usuario = @usuario";
+                    int linhasAfetadas = cmd.ExecuteNonQuery();
 
-                    using (MySqlCommand cmd = new MySqlCommand(sql, conexao))
+                    if (linhasAfetadas > 0)
                     {
-                        
-                        cmd.Parameters.AddWithValue("@nome", txtNome.Text);
-                        cmd.Parameters.AddWithValue("@email", txtEmail.Text);
-                        cmd.Parameters.AddWithValue("@telefone", txtTelefone.Text);
-                        cmd.Parameters.AddWithValue("@usuario", txtLogin.Text); 
+                        MessageBox.Show("Dados atualizados com sucesso!");
 
-                        int linhasAfetadas = cmd.ExecuteNonQuery();
 
-                        if (linhasAfetadas > 0)
-                        {
-                            MessageBox.Show("Dados atualizados com sucesso!");
+                        CarregarDadosNoGrid();
 
-                            
-                            CarregarDadosNoGrid();
 
-                            
-                            LimparCampos();
-                        }
-                        else
-                        {
-                            MessageBox.Show("Nenhum usuário encontrado com esse login.");
-                        }
+                        LimparCampos();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Nenhum usuário encontrado com esse login.");
                     }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Erro ao atualizar: " + ex.Message);
-                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao atualizar: " + ex.Message);
             }
 
         }

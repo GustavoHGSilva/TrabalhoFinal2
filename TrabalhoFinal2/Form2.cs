@@ -36,10 +36,10 @@ namespace TrabalhoFinal2
 
             panelPrincipal.Controls.Clear();
 
-           
+
             uc.Dock = DockStyle.Fill;
 
-           
+
             panelPrincipal.Controls.Add(uc);
         }
 
@@ -49,10 +49,10 @@ namespace TrabalhoFinal2
 
             panelPrincipal.Controls.Clear();
 
-           
+
             uc.Dock = DockStyle.Fill;
 
-            
+
             panelPrincipal.Controls.Add(uc);
         }
     }
