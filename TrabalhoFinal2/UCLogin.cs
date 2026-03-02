@@ -25,17 +25,15 @@ namespace TrabalhoFinal2
         private void botaoEntrar_Click(object sender, EventArgs e)
         {
 
-            string connectionString = "Server=localhost;Database=fastH;Uid=root;Pwd=23571113;";
 
-            using (MySqlConnection conexao = new MySqlConnection(connectionString))
-            {
+                ConexaoBanco bd = new ConexaoBanco();
                 try
                 {
-                    conexao.Open();
+                    bd.AbrirConexao();
                     
                     string sql = "SELECT COUNT(*) FROM usuarios WHERE LOWER(usuario) = LOWER(@user) AND senha = @pass";
 
-                    using (MySqlCommand cmd = new MySqlCommand(sql, conexao))
+                    using (MySqlCommand cmd = new MySqlCommand(sql, bd.conectar))
                     {
                         
                         cmd.Parameters.AddWithValue("@user", txtUsuario.Text.ToLower().Trim());
@@ -58,7 +56,6 @@ namespace TrabalhoFinal2
                 {
                     MessageBox.Show("Erro: " + ex.Message);
                 }
-            }
 
         }
 

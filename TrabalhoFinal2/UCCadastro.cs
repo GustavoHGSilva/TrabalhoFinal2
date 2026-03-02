@@ -43,20 +43,17 @@ namespace TrabalhoFinal2
 
         private void botaoFinalizar_Click(object sender, EventArgs e)
         {
-            string connectionString = "Server=localhost;Database=fastH;Uid=root;Pwd=23571113;";
-
-            using (MySqlConnection conexao = new MySqlConnection(connectionString))
-            {
-
+ 
+                ConexaoBanco bd = new ConexaoBanco();
                 try
                 {
-                    conexao.Open();
+                    bd.AbrirConexao();
 
                     
                     string sql = "INSERT INTO usuarios (nome, usuario, email, telefone, senha) " +
                                  "VALUES (@nome, @usuario, @email, @telefone, @senha)";
 
-                    using (MySqlCommand cmd = new MySqlCommand(sql, conexao))
+                    using (MySqlCommand cmd = new MySqlCommand(sql, bd.conectar))
                     {
                         
                         cmd.Parameters.AddWithValue("@nome", txtNome.Text);
@@ -79,7 +76,6 @@ namespace TrabalhoFinal2
                 {
                     MessageBox.Show("Erro ao conectar ou salvar: " + ex.Message);
                 }
-            }
         }
     }
 }
